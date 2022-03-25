@@ -161,14 +161,18 @@ while (*gpsStream){
         }
 
 
-      if (Firebase.ready() && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0))
-      {
+     
         sendDataPrevMillis = millis();
           String t=String(String(hour+5)+String(":")+String(minute)+String(":")+String(sec));
           String cordinate= String(String("Time: ")+t+String("      ")+String("Cordinate:")+String(String(latitude,7) +String(" ")+ String(longitude,7)));
           Serial.print(t);
           json.set("fields/longitude/stringValue" , t );
           json.toString(content);
+
+           if (Firebase.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
+    {
+
+        dataMillis = millis();
 
       if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), content.c_str()))
     {
@@ -181,22 +185,21 @@ while (*gpsStream){
         Serial.println(fbdo.errorReason());
 
     }
+    }
 
 
           Serial.print(" ");
           Serial.println(cordinate);
-        Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
+      //  Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
           
         
       
       
       
-      }
+      
       
       }
-      else
-      {
-        Serial.println(F("INVALID"));
-      }
+     
     }
-}}
+}
+}
