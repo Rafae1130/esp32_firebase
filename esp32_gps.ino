@@ -6,7 +6,6 @@
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <FirebaseESP8266.h>
-FirebaseJson json;
 FirebaseJson jsonFinal;
 
 
@@ -128,15 +127,21 @@ const char *gpsStream = coord.c_str();
  int hour;
  int sec;
  int minute;
+ FirebaseJson json;
+     String content;
+
+  String documentPath = String(("RFID comes here").c_str());
+
 while (*gpsStream){
     if (gps.encode(*gpsStream++)){
       if (gps.location.isValid())
       {
         latitude=gps.location.lat();
         longitude=gps.location.lng();
-                json.set("long" , latitude );
-                json.set("lat", latitude);
-                jsonFinal.set("location", json);
+                json.set("fields/latitude/doubleValue" , latitude );
+                json.set("fields/longitude/doubleValue" , longitude );
+
+             
 
         Serial.print(latitude);
         Serial.print(" ");
@@ -163,13 +168,23 @@ while (*gpsStream){
           String t=String(String(hour+5)+String(":")+String(minute)+String(":")+String(sec));
           String cordinate= String(String("Time: ")+t+String("      ")+String("Cordinate:")+String(String(latitude,7) +String(" ")+ String(longitude,7)));
           Serial.print(t);
-                          jsonFinal.set("time", t);
+                json.set("fields/longitude/stringValue" , t );
+                    json.toString(content);
+
+                    if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), content.c_str()))
+    {
+    }
+
+    else
+        Serial.println(fbdo.errorReason());
+
 
           Serial.print(" ");
           Serial.println(cordinate);
-        Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
+       // Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
           
         
+      
       }}
       else
       {
