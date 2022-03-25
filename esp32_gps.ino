@@ -6,6 +6,10 @@
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <FirebaseESP8266.h>
+FirebaseJson json;
+FirebaseJson jsonFinal;
+
+
 #endif
 
 
@@ -130,6 +134,10 @@ while (*gpsStream){
       {
         latitude=gps.location.lat();
         longitude=gps.location.lng();
+                json.set("long" , latitude );
+                json.set("lat", latitude);
+                jsonFinal.set("location", json);
+
         Serial.print(latitude);
         Serial.print(" ");
         Serial.println(longitude); 
@@ -155,9 +163,11 @@ while (*gpsStream){
           String t=String(String(hour+5)+String(":")+String(minute)+String(":")+String(sec));
           String cordinate= String(String("Time: ")+t+String("      ")+String("Cordinate:")+String(String(latitude,7) +String(" ")+ String(longitude,7)));
           Serial.print(t);
+                          jsonFinal.set("time", t);
+
           Serial.print(" ");
           Serial.println(cordinate);
-        Serial.printf("Set double... %s\n", Firebase.pushString(fbdo, F("/test/longitude/"), cordinate) ? "ok" : fbdo.errorReason().c_str());
+        Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
           
         
       }}
