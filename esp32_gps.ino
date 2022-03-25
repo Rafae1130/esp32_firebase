@@ -172,19 +172,28 @@ while (*gpsStream){
 
       if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), content.c_str()))
     {
+              Serial.println("added successfully");
+
     }
 
     else
+    {
         Serial.println(fbdo.errorReason());
+
+    }
 
 
           Serial.print(" ");
           Serial.println(cordinate);
-       // Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
+        Serial.printf("Set double... %s\n", Firebase.pushJSON(fbdo, F("/test/longitude/"), jsonFinal) ? "ok" : fbdo.errorReason().c_str());
           
         
       
-      }}
+      
+      
+      }
+      
+      }
       else
       {
         Serial.println(F("INVALID"));
