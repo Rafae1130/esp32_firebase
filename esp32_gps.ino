@@ -1,17 +1,16 @@
-
-
 #if defined(ESP32)
 #include <WiFi.h>
-#include <FirebaseESP32.h>
+//#include <FirebaseESP32.h>
+#include <Firebase_ESP_Client.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <FirebaseESP8266.h>
-FirebaseJson jsonFinal;
+
 
 
 #endif
 
-
+FirebaseJson jsonFinal;
 #include <TinyGPSPlus.h> 
 TinyGPSPlus gps;
 
@@ -102,7 +101,7 @@ void setup()
 }
 
 
-
+#define FIREBASE_PROJECT_ID  "espgps-cf1ad" 
 
 
 void loop()
@@ -112,7 +111,7 @@ while(Serial.available()){
   coord="";
   Serial.println("In the loop");
   coord=Serial.readStringUntil('\r\n');
-  }
+  
   Serial.println(coord.c_str());
 
   Serial.println(Serial.read());
@@ -130,7 +129,7 @@ const char *gpsStream = coord.c_str();
  FirebaseJson json;
      String content;
 
-  String documentPath = String(("RFID comes here").c_str());
+  String documentPath = String("RFID comes here");
 
 while (*gpsStream){
     if (gps.encode(*gpsStream++)){
@@ -168,10 +167,10 @@ while (*gpsStream){
           String t=String(String(hour+5)+String(":")+String(minute)+String(":")+String(sec));
           String cordinate= String(String("Time: ")+t+String("      ")+String("Cordinate:")+String(String(latitude,7) +String(" ")+ String(longitude,7)));
           Serial.print(t);
-                json.set("fields/longitude/stringValue" , t );
-                    json.toString(content);
+          json.set("fields/longitude/stringValue" , t );
+          json.toString(content);
 
-                    if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), content.c_str()))
+      if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), content.c_str()))
     {
     }
 
@@ -191,4 +190,4 @@ while (*gpsStream){
         Serial.println(F("INVALID"));
       }
     }
-}
+}}
